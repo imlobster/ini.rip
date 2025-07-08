@@ -6,7 +6,9 @@ namespace MINI.Analysis
 {
     public class Lexer
     {
-        private int caretPosition=0, tempCaretPosition=0, tempCaretLength=0;
+        private int caretPosition=0, tempCaretPosition=0, tempCaretLength=0, tempStartOffset=0, tempEndOffset=0;
+        bool tempWasStart;
+        
         private TokenKind tempTokenKind = TokenKind.Unknown;
         private readonly List<Token> tokens = [];
         private char current = ' ';
@@ -34,6 +36,7 @@ namespace MINI.Analysis
                 tempTokenKind = current switch
                 {
                     ';' => TokenKind.Comment,
+                    '#' => TokenKind.Comment,
                     '[' => TokenKind.OpenBracketsSign,
                     _ when current != ' ' && current != '\t' && current != '\n' && current != '\r' => TokenKind.Identifier,
                     _ => TokenKind.Unknown
@@ -100,6 +103,8 @@ namespace MINI.Analysis
 
             while (caretPosition < source.Length)
             {
+                current = source[caretPosition];
+
                 if (
                     current == '\n' ||
                     current == '\r'
@@ -113,14 +118,10 @@ namespace MINI.Analysis
                     break;
                 }
 
-                caretPosition++;
+                caretPosition++; tempCaretLength++;
             }
 
             tokens.Add(new Token(TokenKind.Identifier, tempCaretPosition+1, tempCaretLength));
-
-            caretPosition++;
-
-            tokens.Add(new Token(TokenKind.EqualSign, caretPosition, 1));
 
             return true;
         }
@@ -163,6 +164,8 @@ namespace MINI.Analysis
             tempCaretLength = 1;
             tempTokenKind = TokenKind.NumericalValue;
 
+            tempStartOffset = 0; tempEndOffset = 0; tempWasStart = false;
+
             while (caretPosition < source.Length)
             {
                 current = source[caretPosition];
@@ -182,24 +185,42 @@ namespace MINI.Analysis
                     tempTokenKind = TokenKind.LiteralValue;
                 }
 
+                if (current == ' ')
+                {
+                    if (tempWasStart)
+                    {
+                        tempEndOffset++;
+                    }
+                    else
+                    {
+                        tempStartOffset++;
+                    }
+                }
+                else
+                {
+                    tempEndOffset = 0;
+                    if (!tempWasStart)
+                    {
+                        tempWasStart = true;
+                    }
+                }
+
                 caretPosition++; tempCaretLength++;
             }
 
-            if (tempTokenKind == TokenKind.Identifier && tempCaretLength <= 5)
+            if (tempCaretLength - tempStartOffset - tempEndOffset <= 5 && tempCaretLength - tempStartOffset - tempEndOffset > 0)
             {
+                var valueSpan = source.Slice(tempCaretPosition + tempStartOffset, tempCaretLength - tempStartOffset - tempEndOffset);
 
-                if (
-                    source.Slice(tempCaretPosition, tempCaretLength) == "true" ||
-                    source.Slice(tempCaretPosition, tempCaretLength) == "false"
-                )
+                if (valueSpan.SequenceEqual("true".AsSpan()) ||
+                    valueSpan.SequenceEqual("false".AsSpan()))
                 {
                     tempTokenKind = TokenKind.BooleanValue;
                 }
-
             }
 
-            tokens.Add(new Token(tempTokenKind, tempCaretPosition, tempCaretLength));
-
+            tokens.Add(new Token(tempTokenKind, tempCaretPosition + tempStartOffset, tempCaretLength - tempStartOffset - tempEndOffset));
+            
             return true;
         }
 
