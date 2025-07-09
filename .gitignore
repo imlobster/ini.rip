@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Testing App
+[Tt]esting[Aa]pp/
+
 # User-specific files
 *.rsuser
 *.suo
