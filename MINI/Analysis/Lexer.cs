@@ -1,15 +1,12 @@
 ﻿using MINI.Models;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace MINI.Analysis
 {
     public class Lexer
     {
-        private int caretPosition=0, tempCaretPosition=0, tempCaretLength=0, tempStartOffset=0, tempEndOffset=0;
-        bool tempWasStart;
+        private int caretPosition = 0, tempCaretPosition = 0, tempCaretLength = 0;
         
-        private TokenKind tempTokenKind = TokenKind.Unknown;
         private readonly List<Token> tokens = [];
         private char current = ' ';
 
@@ -20,46 +17,77 @@ namespace MINI.Analysis
 
             while (caretPosition < source.Length)
             {
-                current = source[caretPosition];
+                current = source[caretPosition]; 
 
-                if (
-                    current == ' ' ||
-                    current == '\t'||
-                    current == '\n'||
-                    current == '\r'
-                )
+                if(current == '\r')
                 {
+                    caretPosition++;
+
+                    if (caretPosition < source.Length && source[caretPosition] == '\n')
+                    {
+#if DEBUG
+                        Console.WriteLine("\t\\r\\n symbols");
+#endif
+                        tokens.Add(new(TokenKind.EOL, caretPosition - 1, 2));
+                        caretPosition++;
+                        continue;
+                    }
+
+#if DEBUG
+                    Console.WriteLine("\t\\n symbol");
+#endif
+                    tokens.Add(new(TokenKind.EOL, caretPosition - 1, 1));
+                    continue;
+                }
+
+                if(current == '\n')
+                {
+#if DEBUG
+                    Console.WriteLine("\t\\n symbol");
+#endif
+                    caretPosition++;
+                    tokens.Add(new(TokenKind.EOL, caretPosition - 1, 1));
+                    continue;
+                }
+
+                if(current == '\t' || current == ' ' || current == '\f' || current == '\v')
+                {
+#if DEBUG
+                    Console.WriteLine("\tuseless symbol");
+#endif
                     caretPosition++;
                     continue;
                 }
 
-                tempTokenKind = current switch
+                switch (current)
                 {
-                    ';' => TokenKind.Comment,
-                    '#' => TokenKind.Comment,
-                    '[' => TokenKind.OpenBracketsSign,
-                    _ when current != ' ' && current != '\t' && current != '\n' && current != '\r' => TokenKind.Identifier,
-                    _ => TokenKind.Unknown
-                };
+                    case '=':
+#if DEBUG
+                        Console.WriteLine($"\t equal sign, {current}");
+#endif
+                        tokens.Add(new(TokenKind.EqualSign, caretPosition, 1));
+                        caretPosition++;
+                        break;
+                    case ';' or '#':
+#if DEBUG
+                        Console.WriteLine($"\t comment, {current}");
+#endif
+                        SkipComment(ref source);
+                        break;
+                    case '[':
+#if DEBUG
+                        Console.WriteLine($"\t section symbol, {current}");
+#endif
 
-                switch (tempTokenKind)
-                {
-                    case TokenKind.Comment:BuildComment(ref source); break;
-                    case TokenKind.Identifier:
-                        if (!TryBuildKeyValuePair(ref source))
-                        {
-                            outtokens = default;
-                            return false;
-                        }
+                        caretPosition++;
+                        BuildSection(ref source);
                         break;
-                    case TokenKind.OpenBracketsSign:
-                        if (!TryBuildSection(ref source))
-                        {
-                            outtokens = default;
-                            return false;
-                        }
+                    default:
+#if DEBUG
+                        Console.WriteLine($"\t default, {current}");
+#endif
+                        BuildLiteral(ref source);
                         break;
-                    default: caretPosition++; break;
                 }
             }
 
@@ -73,157 +101,72 @@ namespace MINI.Analysis
             return true;
         }
 
-        #region Builders
+#region Builders
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void BuildComment(ref ReadOnlySpan<char> source)
+        private void SkipComment(ref ReadOnlySpan<char> source)
         {
-            while (caretPosition < source.Length)
+            while(caretPosition < source.Length)
             {
                 current = source[caretPosition];
 
-                if (
-                    current == '\n' ||
-                    current == '\r'
-                )
+                if (current == '\r' || current == '\n')
                 {
                     break;
                 }
 
+#if DEBUG
+                Console.WriteLine($"\tIN SKIPCOMMENT\t symbol {current}");
+#endif
                 caretPosition++;
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryBuildSection(ref ReadOnlySpan<char> source)
+        private void BuildSection(ref ReadOnlySpan<char> source)
         {
             tempCaretPosition = caretPosition;
             tempCaretLength = 0;
-            caretPosition++;
 
             while (caretPosition < source.Length)
             {
                 current = source[caretPosition];
 
-                if (
-                    current == '\n' ||
-                    current == '\r'
-                )
+                if (current == ']' || current == '\r' || current == '\n')
                 {
-                    return false;
-                }
-
-                if(current == ']')
-                {
+                    caretPosition++;
                     break;
                 }
 
-                caretPosition++; tempCaretLength++;
+#if DEBUG
+                Console.WriteLine($"\tIN BUILDSECTION\t symbol {current}");
+#endif
+                caretPosition++;
+                tempCaretLength++;
             }
 
-            tokens.Add(new Token(TokenKind.Identifier, tempCaretPosition+1, tempCaretLength));
-
-            return true;
+            tokens.Add(new(TokenKind.Section, tempCaretPosition, tempCaretLength));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryBuildKeyValuePair(ref ReadOnlySpan<char> source)
+        private void BuildLiteral(ref ReadOnlySpan<char> source)
         {
             tempCaretPosition = caretPosition;
-            tempCaretLength = 1;
-            caretPosition++;
+            tempCaretLength = 0;
 
             while (caretPosition < source.Length)
             {
                 current = source[caretPosition];
 
-                if (
-                    current == '\n' ||
-                    current == '\r'
-                )
-                {
-                    return false;
-                }
-
-                if (current == '=')
-                {
-                    break;
-                }
-
-                caretPosition++; tempCaretLength++;
+                if (current == '\r' || current == '\n') { break; }
+                if(current == '=' || current == ';' || current == '#') { break; }
+#if DEBUG
+                Console.WriteLine($"\tIN BUILDLITERAL\t symbol {current}");
+#endif
+                caretPosition++;
+                tempCaretLength++;
             }
 
-            tokens.Add(new Token(TokenKind.Identifier, tempCaretPosition, tempCaretLength));
-
-            caretPosition++;
-
-            tokens.Add(new Token(TokenKind.EqualSign, caretPosition, 1));
-
-            caretPosition++;
-            tempCaretPosition = caretPosition;
-            tempCaretLength = 1;
-            tempTokenKind = TokenKind.NumericalValue;
-
-            tempStartOffset = 0; tempEndOffset = 0; tempWasStart = false;
-
-            while (caretPosition < source.Length)
-            {
-                current = source[caretPosition];
-
-                if (
-                    current == '\n' ||
-                    current == '\r'
-                )
-                {
-                    break;
-                }
-
-                if (tempTokenKind == TokenKind.NumericalValue && (!(current >= '0' && current <= '9') &&
-                    current != '-' && current != '.')
-                )
-                {
-                    tempTokenKind = TokenKind.LiteralValue;
-                }
-
-                if (current == ' ')
-                {
-                    if (tempWasStart)
-                    {
-                        tempEndOffset++;
-                    }
-                    else
-                    {
-                        tempStartOffset++;
-                    }
-                }
-                else
-                {
-                    tempEndOffset = 0;
-                    if (!tempWasStart)
-                    {
-                        tempWasStart = true;
-                    }
-                }
-
-                caretPosition++; tempCaretLength++;
-            }
-
-            if (tempCaretLength - tempStartOffset - tempEndOffset <= 5 && tempCaretLength - tempStartOffset - tempEndOffset > 0)
-            {
-                var valueSpan = source.Slice(tempCaretPosition + tempStartOffset, tempCaretLength - tempStartOffset - tempEndOffset);
-
-                if (valueSpan.SequenceEqual("true".AsSpan()) ||
-                    valueSpan.SequenceEqual("false".AsSpan()))
-                {
-                    tempTokenKind = TokenKind.BooleanValue;
-                }
-            }
-
-            tokens.Add(new Token(tempTokenKind, tempCaretPosition + tempStartOffset, tempCaretLength - tempStartOffset - tempEndOffset));
-            
-            return true;
+            tokens.Add(new(TokenKind.Literal, tempCaretPosition, tempCaretLength));
         }
 
-        #endregion
+#endregion
     }
 }

@@ -3,13 +3,11 @@
     public enum TokenKind : byte
     {
         Unknown,
-        Comment,
-        Identifier,
-        NumericalValue,
-        LiteralValue,
-        BooleanValue,
+        Section,
+        Literal,
         EqualSign,
         OpenBracketsSign,
         CloseBracketsSign,
+        EOL,
     }
 }
