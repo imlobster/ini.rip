@@ -20,7 +20,7 @@ namespace INIRIP.Analysis
 
         public bool TryParseTokens
         (
-            ref string source,
+            string source,
             ReadOnlySpan<Token> intokens,
             out Dictionary<
                     ReadOnlyMemory<char>,
@@ -48,7 +48,7 @@ namespace INIRIP.Analysis
 #if DEBUG
                         Console.WriteLine($"INMAINCYCLE\tsection, {source.Substring(current.Start, current.Length)}");
 #endif
-                        BuildSection(ref source, intokens);
+                        BuildSection(source, intokens);
                         break;
                     default:
 #if DEBUG
@@ -86,7 +86,7 @@ namespace INIRIP.Analysis
         }
 
 #region Builders
-        private void BuildSection(ref string source, ReadOnlySpan<Token> intokens)
+        private void BuildSection(string source, ReadOnlySpan<Token> intokens)
         {
 #if DEBUG
             Console.WriteLine($"\tINBUILDSECTION\tchecking ???: {{{source.Substring(current.Start, current.Length)}}} with kind {current.Kind}");
@@ -110,7 +110,7 @@ namespace INIRIP.Analysis
 
                 if (current.Kind != TokenKind.Literal) { break; }
 
-                BuildValue(ref source, intokens, ref dictbuffer);
+                BuildValue(source, intokens, ref dictbuffer);
             }
 
 #if DEBUG
@@ -126,7 +126,7 @@ namespace INIRIP.Analysis
             } 
         }
 
-        private void BuildValue(ref string source, ReadOnlySpan<Token> intokens, ref Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>> dictbuffer)
+        private void BuildValue(string source, ReadOnlySpan<Token> intokens, ref Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>> dictbuffer)
         {
             while (pointerPosition < intokens.Length)
             {
