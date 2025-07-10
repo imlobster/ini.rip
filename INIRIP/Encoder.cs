@@ -10,7 +10,7 @@ namespace INIRIP
 
         public static bool TryDecode
         (
-            ref string source,
+            string source,
 
             out Dictionary<
                     ReadOnlyMemory<char>,
@@ -23,7 +23,7 @@ namespace INIRIP
         {
             if ( source == null ) { outvals = []; return false; }
             if (!lexer.TryLexText(source.AsSpan(), out ReadOnlySpan<INIRIP.Models.Token> tokens)) { outvals = []; return false; }
-            if (!parser.TryParseTokens(ref source, tokens, out outvals)) { outvals = []; return false; }
+            if (!parser.TryParseTokens(source, tokens, out outvals)) { outvals = []; return false; }
             return true;
         }
     }
