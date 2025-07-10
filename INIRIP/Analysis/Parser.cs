@@ -1,6 +1,4 @@
 ﻿using INIRIP.Models;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace INIRIP.Analysis
 {
@@ -23,7 +21,7 @@ namespace INIRIP.Analysis
         public bool TryParseTokens
         (
             ref string source,
-            ref ReadOnlySpan<Token> intokens,
+            ReadOnlySpan<Token> intokens,
             out Dictionary<
                     ReadOnlyMemory<char>,
                     Dictionary<
@@ -34,6 +32,7 @@ namespace INIRIP.Analysis
         )
         {
             values.Clear();
+            pointerPosition = 0;
 
             while(pointerPosition < intokens.Length)
             {
@@ -49,7 +48,7 @@ namespace INIRIP.Analysis
 #if DEBUG
                         Console.WriteLine($"INMAINCYCLE\tsection, {source.Substring(current.Start, current.Length)}");
 #endif
-                        BuildSection(ref source, ref intokens);
+                        BuildSection(ref source, intokens);
                         break;
                     default:
 #if DEBUG
@@ -60,13 +59,13 @@ namespace INIRIP.Analysis
                 }
             }
 
-            if (values.Count < 1) { outvals = default; return false; }
+            if (values.Count < 1) { outvals = []; return false; }
 
             outvals = values;
             return true;
         }
 
-        private void SkipToTheNextLine(ref ReadOnlySpan<Token> intokens)
+        private void SkipToTheNextLine(ReadOnlySpan<Token> intokens)
         {
             while(pointerPosition < intokens.Length)
             {
@@ -87,20 +86,20 @@ namespace INIRIP.Analysis
         }
 
 #region Builders
-        private void BuildSection(ref string source, ref ReadOnlySpan<Token> intokens)
+        private void BuildSection(ref string source, ReadOnlySpan<Token> intokens)
         {
 #if DEBUG
             Console.WriteLine($"\tINBUILDSECTION\tchecking ???: {{{source.Substring(current.Start, current.Length)}}} with kind {current.Kind}");
 #endif
 
-            if (values.ContainsKey(source.AsMemory(current.Start, current.Length))) { SkipToTheNextLine(ref intokens); return; }
+            if (values.ContainsKey(source.AsMemory(current.Start, current.Length))) { SkipToTheNextLine(intokens); return; }
 
             secinf_start = current.Start;
             secinf_length = current.Length;
 
             Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>> dictbuffer = [];
 
-            SkipToTheNextLine(ref intokens);
+            SkipToTheNextLine(intokens);
 
             while (pointerPosition < intokens.Length)
             {
@@ -111,7 +110,7 @@ namespace INIRIP.Analysis
 
                 if (current.Kind != TokenKind.Literal) { break; }
 
-                BuildValue(ref source, ref intokens, ref dictbuffer);
+                BuildValue(ref source, intokens, ref dictbuffer);
             }
 
 #if DEBUG
@@ -127,7 +126,7 @@ namespace INIRIP.Analysis
             } 
         }
 
-        private void BuildValue(ref string source, ref ReadOnlySpan<Token> intokens, ref Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>> dictbuffer)
+        private void BuildValue(ref string source, ReadOnlySpan<Token> intokens, ref Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>> dictbuffer)
         {
             while (pointerPosition < intokens.Length)
             {
@@ -149,20 +148,20 @@ namespace INIRIP.Analysis
 #if DEBUG
             Console.WriteLine($"\tINBUILDVALUE\tmaybe literal?, {source.Substring(current.Start, current.Length)}");
 #endif
-            if (current.Kind != TokenKind.Literal) { SkipToTheNextLine(ref intokens); return; }
+            if (current.Kind != TokenKind.Literal) { SkipToTheNextLine(intokens); return; }
             pointerPosition++;
             current = intokens[pointerPosition];
 #if DEBUG
             Console.WriteLine($"\tINBUILDVALUE\tmaybe equal?, {source.Substring(current.Start, current.Length)}");
 #endif
-            if (pointerPosition < intokens.Length && current.Kind != TokenKind.EqualSign) { SkipToTheNextLine(ref intokens); return; }
+            if (pointerPosition < intokens.Length && current.Kind != TokenKind.EqualSign) { SkipToTheNextLine(intokens); return; }
             pointerPosition++;
             current = intokens[pointerPosition];
 #if DEBUG
             Console.WriteLine($"\tINBUILDVALUE\tmaybe literal?, {source.Substring(current.Start, current.Length)}");
 #endif
-            if (pointerPosition < intokens.Length && current.Kind != TokenKind.Literal) { SkipToTheNextLine(ref intokens); return; }
-            if (dictbuffer.ContainsKey(source.AsMemory(intokens[pointerPosition-2].Start, intokens[pointerPosition-2].Length))) { SkipToTheNextLine(ref intokens); return; }
+            if (pointerPosition < intokens.Length && current.Kind != TokenKind.Literal) { SkipToTheNextLine(intokens); return; }
+            if (dictbuffer.ContainsKey(source.AsMemory(intokens[pointerPosition-2].Start, intokens[pointerPosition-2].Length))) { SkipToTheNextLine(intokens); return; }
 
             dictbuffer.TryAdd
                     (
@@ -174,7 +173,7 @@ namespace INIRIP.Analysis
                         source.AsMemory(current.Start, current.Length)
                     );
 
-            SkipToTheNextLine(ref intokens); return;
+            SkipToTheNextLine(intokens); return;
         }
 #endregion
     }
