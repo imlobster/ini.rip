@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MINI", "MINI\MINI.csproj", "{42A5E4C4-E795-4BA3-8D7F-FB1630FB44D0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingApp", "TestingApp\TestingApp.csproj", "{91109591-FA82-4DC2-AF0A-BDF6F895FDFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INIRIP", "INIRIP\INIRIP.csproj", "{1278B3BE-1424-8487-F165-5DB836A75DC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{42A5E4C4-E795-4BA3-8D7F-FB1630FB44D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42A5E4C4-E795-4BA3-8D7F-FB1630FB44D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42A5E4C4-E795-4BA3-8D7F-FB1630FB44D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42A5E4C4-E795-4BA3-8D7F-FB1630FB44D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91109591-FA82-4DC2-AF0A-BDF6F895FDFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91109591-FA82-4DC2-AF0A-BDF6F895FDFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91109591-FA82-4DC2-AF0A-BDF6F895FDFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91109591-FA82-4DC2-AF0A-BDF6F895FDFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1278B3BE-1424-8487-F165-5DB836A75DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1278B3BE-1424-8487-F165-5DB836A75DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1278B3BE-1424-8487-F165-5DB836A75DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1278B3BE-1424-8487-F165-5DB836A75DC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

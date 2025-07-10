@@ -1,4 +1,4 @@
-﻿namespace MINI.Models
+﻿namespace INIRIP.Models
 {
     public enum TokenKind : byte
     {

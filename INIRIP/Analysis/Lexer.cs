@@ -1,7 +1,7 @@
-﻿using MINI.Models;
+﻿using INIRIP.Models;
 using System.Runtime.InteropServices;
 
-namespace MINI.Analysis
+namespace INIRIP.Analysis
 {
     public class Lexer
     {
