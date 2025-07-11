@@ -25,26 +25,26 @@ namespace INIRIP.Analysis
 
                     if (caretPosition < source.Length && source[caretPosition] == '\n')
                     {
-#if DEBUG
-                        Console.WriteLine("\t\\r\\n symbols");
-#endif
+//#if DEBUG
+//                        Console.WriteLine("\t\\r\\n symbols");
+//#endif
                         tokens.Add(new(TokenKind.EOL, caretPosition - 1, 2));
                         caretPosition++;
                         continue;
                     }
 
-#if DEBUG
-                    Console.WriteLine("\t\\n symbol");
-#endif
+//#if DEBUG
+//                    Console.WriteLine("\t\\n symbol");
+//#endif
                     tokens.Add(new(TokenKind.EOL, caretPosition - 1, 1));
                     continue;
                 }
 
                 if(current == '\n')
                 {
-#if DEBUG
-                    Console.WriteLine("\t\\n symbol");
-#endif
+//#if DEBUG
+//                    Console.WriteLine("\t\\n symbol");
+//#endif
                     caretPosition++;
                     tokens.Add(new(TokenKind.EOL, caretPosition - 1, 1));
                     continue;
@@ -52,9 +52,9 @@ namespace INIRIP.Analysis
 
                 if(current == '\t' || current == ' ' || current == '\f' || current == '\v')
                 {
-#if DEBUG
-                    Console.WriteLine("\tuseless symbol");
-#endif
+//#if DEBUG
+//                    Console.WriteLine("\tuseless symbol");
+//#endif
                     caretPosition++;
                     continue;
                 }
@@ -62,30 +62,30 @@ namespace INIRIP.Analysis
                 switch (current)
                 {
                     case '=':
-#if DEBUG
-                        Console.WriteLine($"\t equal sign, {current}");
-#endif
+//#if DEBUG
+//                        Console.WriteLine($"\t equal sign, {current}");
+//#endif
                         tokens.Add(new(TokenKind.EqualSign, caretPosition, 1));
                         caretPosition++;
                         break;
                     case ';' or '#':
-#if DEBUG
-                        Console.WriteLine($"\t comment, {current}");
-#endif
+//#if DEBUG
+//                        Console.WriteLine($"\t comment, {current}");
+//#endif
                         SkipComment(ref source);
                         break;
                     case '[':
-#if DEBUG
-                        Console.WriteLine($"\t section symbol, {current}");
-#endif
+//#if DEBUG
+//                        Console.WriteLine($"\t section symbol, {current}");
+//#endif
 
                         caretPosition++;
                         BuildSection(ref source);
                         break;
                     default:
-#if DEBUG
-                        Console.WriteLine($"\t default, {current}");
-#endif
+//#if DEBUG
+//                        Console.WriteLine($"\t default, {current}");
+//#endif
                         BuildLiteral(ref source);
                         break;
                 }
@@ -114,9 +114,9 @@ namespace INIRIP.Analysis
                     break;
                 }
 
-#if DEBUG
-                Console.WriteLine($"\tIN SKIPCOMMENT\t symbol {current}");
-#endif
+//#if DEBUG
+//                Console.WriteLine($"\tIN SKIPCOMMENT\t symbol {current}");
+//#endif
                 caretPosition++;
             }
         }
@@ -136,9 +136,9 @@ namespace INIRIP.Analysis
                     break;
                 }
 
-#if DEBUG
-                Console.WriteLine($"\tIN BUILDSECTION\t symbol {current}");
-#endif
+//#if DEBUG
+//                Console.WriteLine($"\tIN BUILDSECTION\t symbol {current}");
+//#endif
                 caretPosition++;
                 tempCaretLength++;
             }
@@ -157,9 +157,9 @@ namespace INIRIP.Analysis
 
                 if (current == '\r' || current == '\n') { break; }
                 if(current == '=' || current == ';' || current == '#') { break; }
-#if DEBUG
-                Console.WriteLine($"\tIN BUILDLITERAL\t symbol {current}");
-#endif
+//#if DEBUG
+//                Console.WriteLine($"\tIN BUILDLITERAL\t symbol {current}");
+//#endif
                 caretPosition++;
                 tempCaretLength++;
             }
