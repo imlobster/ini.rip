@@ -32,6 +32,7 @@ namespace INIRIP.Compiler
                     stringbuilder.Append(kvp2.Value);
                     stringbuilder.Append("\r\n");
                 }
+                stringbuilder.Append("\r\n");
             }
 
             try

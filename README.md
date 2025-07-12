@@ -1,17 +1,15 @@
-# WORK ON SERIALIZER IN PROGRESS!
-
 ## <img src="inirip.png" alt="inirip" width="32" height="32"> ini.rip
 
 I really dont know why th are you going to use this, although it works well so enjoy it till its working. Dont take it too seriously.
 
 ## usage
 
-To use ini.rip you need to:
+How to use ini.rip:
 1. download INIRIP folder and put it into your sln folder
 2. link INIRIP class library to your project
 3. extract your .ini file into `string` variable in your script
 4. import `using INIRIP;` into your script
-5.  use `INIRIP.Encoder.TryDecode(yourstring, out Dictionary<ReadOnlyMemory<char>, Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>>> youroutvalues)`
+5.  use `Coder.TryDecode(yourstring, out Dictionary<ReadOnlyMemory<char>, Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>>> youroutvalues)`
 6. then you get your deserialized .ini
 7. the structure looks like this:
 	* sections
@@ -20,7 +18,9 @@ To use ini.rip you need to:
 	* sections
 		* keys and values
 		* keys and values
-8. pray it to work
+8. to save your values in ini you need to build your `Dictionary<ReadOnlyMemory<char>, Dictionary<ReadOnlyMemory<char>, ReadOnlyMemory<char>>>` or use your edited output from decoding
+9. put your full path to file and your dictionary in `Coder.TryEncode("C:\Users\Desktop\MyFile.ini", MyValues)`
+10. pray it all to work
 
 ## performance
 | Average Time   | Median Time   | Min Time     | Max Time   |
