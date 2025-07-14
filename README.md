@@ -22,8 +22,8 @@ How to use ini.rip:
 9. put your full path to file and your dictionary in `Coder.TryEncode("C:\Users\Desktop\MyFile.ini", MyValues)`
 10. pray it all to work
 
-## performance
-| Average Time   | Median Time   | Min Time     | Max Time   |
+## performance on 10k symbols
+| Average Time | Median Time | Min Time | Max Time |
 |-|-|-|-|
 | 44.0 µs        | 44.0 µs       | 26.7 µs      | 66.9 µs    |
 ######
