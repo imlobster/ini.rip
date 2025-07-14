@@ -1,6 +1,6 @@
 ## <img src="inirip.png" alt="inirip" width="32" height="32"> ini.rip
 
-I really dont know why th are you going to use this, although it works well so enjoy it till its working. Dont take it too seriously.
+I really dont know why an ini file will be 1000gb or more, although it can parse it very fast so enjoy it.
 
 ## usage
 
