@@ -5,6 +5,7 @@ I really dont know why an ini file will be 1000gb or more, although it can parse
 ## usage
 
 How to use ini.rip:
+
 0. make sure your file is ascii only
 1. download INIRIP folder and put it into your sln folder
 2. link INIRIP class library to your project
